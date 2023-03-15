@@ -8,7 +8,9 @@
     "dev": "./node_modules/.bin/nodemon --experimental-modules --es-module-specifier-resolution=node ./src/app.js",
     "lint": "./node_modules/.bin/eslint **/*.js",
     "lint:fix": "./node_modules/.bin/eslint **/*.js --fix",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:cover": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
+    "test:watch": "node --experimental-vm-modules node_modules/jest/bin/jest.js --watch"
   },
   "author": "",
   "license": "ISC",

@@ -19,6 +19,8 @@
 #### Run tests
 ##### `npm test`
 
+##### *you can use `test:cover` and `test:watch` also*
+
 ----
 
 #### Run linting
