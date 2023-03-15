@@ -1,14 +1,9 @@
-import fs from 'fs/promises';
+import parseJson from './utils/parseJson';
 
-const filepath = process.argv[2];
-
-if (!filepath) {
-  throw Error('File path is required');
+async function app() {
+  const filepath = process.argv[2];
+  const parsedJson = await parseJson(filepath);
+  console.log(parsedJson);
 }
 
-fs.readFile(filepath).then((res) => {
-  const parsed = JSON.parse(res);
-  console.log(parsed);
-}).catch((error) => {
-  console.error(error);
-});
+app();
