@@ -1,4 +1,4 @@
-import calculateFee, { calculateCashIn } from '../../utils/calculateFee';
+import calculateFee, { calculateCashIn, cashOutJuridical } from '../../utils/calculateFee';
 import constants from '../../constants';
 
 describe('Should calculate fees', () => {
@@ -22,5 +22,13 @@ describe('Should calculate fees', () => {
     const maxValue = constants.cashInMaxFee / (constants.cashInPercent / 100);
 
     expect(calculateCashIn(maxValue + 1)).toBe(5);
+  });
+
+  it('Should calculate cash out juridical - when fee is more then min', () => {
+    expect(cashOutJuridical(10000)).toBe(30);
+  });
+
+  it('Should calculate cash out juridical - when fee is less then min', () => {
+    expect(cashOutJuridical(constants.cashOutJuridicalMinFee)).toBe(0.5);
   });
 });

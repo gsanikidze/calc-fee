@@ -1,22 +1,67 @@
 import constants from '../constants';
+import { isInSameWeek } from './helpers';
 
-export function roundFee(amount) {
-  return Number((Math.ceil(amount * 100) / 100).toFixed(2));
+export function prevCashOutsInSameWeek({
+  id, date, user_id, transactions,
+}) {
+  const otherTransactions = transactions
+    .filter((transaction) => transaction.id < id
+     && transaction.user_id === user_id
+     && transaction.type === 'cash_out');
+  const otherTransactionsInSameWeek = otherTransactions
+    .filter((tr) => isInSameWeek(tr.date, date));
+
+  return otherTransactionsInSameWeek;
 }
 
 export function calculateCashIn(amount) {
   const fee = (constants.cashInPercent / 100) * amount;
 
-  return fee > constants.cashInMaxFee ? constants.cashInMaxFee : roundFee(fee);
+  return fee > constants.cashInMaxFee ? constants.cashInMaxFee : fee;
 }
 
-export function calculateCashOut() {
-  return 0;
+export function cashOutJuridical(amount) {
+  const fee = (constants.cashOutJuridicalPercent / 100) * amount;
+
+  return fee < constants.cashOutJuridicalMinFee ? constants.cashOutJuridicalMinFee : fee;
+}
+
+export function cashOutNatural(amount) {
+  return (constants.cashOutNaturalPercent / 100) * amount;
+}
+
+export function calculateCashOut({
+  id, user_id, transactions, user_type, amount, date,
+}) {
+  if (user_type === 'natural') {
+    const prevTransactionsTotal = prevCashOutsInSameWeek({
+      id, user_id, transactions, date,
+    }).reduce((acc, curr) => acc + curr.operation.amount, 0);
+
+    if (prevTransactionsTotal >= constants.cashOutNaturalFreeOfChargeLimit) {
+      return cashOutNatural(amount);
+    }
+
+    const limitLeft = constants.cashOutNaturalFreeOfChargeLimit - prevTransactionsTotal;
+    const newAmount = amount - limitLeft;
+
+    if (newAmount <= 0) {
+      return 0;
+    }
+
+    return cashOutNatural(newAmount);
+  }
+
+  if (user_type === 'juridical') {
+    return cashOutJuridical(amount);
+  }
+
+  throw new Error('Invalid user type');
 }
 
 export default function calculateFee({
-  date, user_id, user_type, type, operation,
-}) {
+  id, date, user_id, user_type, type, operation,
+}, transactions) {
   if (operation.currency !== constants.supportedCurrency) {
     throw new Error('Unsupported currency');
   }
@@ -26,7 +71,14 @@ export default function calculateFee({
   }
 
   if (type === 'cash_out') {
-    return calculateCashOut();
+    return calculateCashOut({
+      id,
+      user_id,
+      user_type,
+      amount: operation.amount,
+      transactions,
+      date,
+    });
   }
 
   throw new Error('Invalid transaction type');
