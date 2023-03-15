@@ -1,6 +1,4 @@
 import fs from 'fs/promises';
-// import { stdin, stdout } from 'node:process';
-// import readline from 'readline';
 
 const filepath = process.argv[2];
 
