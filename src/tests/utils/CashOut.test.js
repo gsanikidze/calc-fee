@@ -3,11 +3,11 @@ import constants from '../../constants';
 
 describe('Should test cash out functionality', () => {
   it('Should calculate cash out juridical - when fee is more then min', () => {
-    expect(CashOut.calcJuridicalFee(10000)).toBe(30);
+    expect(CashOut.juridical(10000)).toBe(30);
   });
 
   it('Should calculate cash out juridical - when fee is less then min', () => {
-    expect(CashOut.calcJuridicalFee(constants.cashOutJuridicalMinFee)).toBe(0.5);
+    expect(CashOut.juridical(constants.cashOutJuridicalMinFee)).toBe(0.5);
   });
 
   it('Should calculate cash out natural', () => {

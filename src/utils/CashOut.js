@@ -15,7 +15,7 @@ export default class CashOut {
     return otherTransactionsInSameWeek;
   }
 
-  static calcJuridicalFee(amount) {
+  static juridical(amount) {
     const fee = (constants.cashOutJuridicalPercent / 100) * amount;
 
     return fee < constants.cashOutJuridicalMinFee ? constants.cashOutJuridicalMinFee : fee;
@@ -56,7 +56,7 @@ export default class CashOut {
     }
 
     if (user_type === 'juridical') {
-      return CashOut.calcJuridicalFee(amount);
+      return CashOut.juridical(amount);
     }
 
     throw new Error('Invalid user type');
