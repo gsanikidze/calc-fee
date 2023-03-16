@@ -1,4 +1,6 @@
-import calculateFee, { calculateCashIn, cashOutJuridical } from '../../utils/calculateFee';
+import calculateFee, {
+  calculateCashIn, cashOutJuridical, cashOutNatural, prevCashOutsInSameWeek,
+} from '../../utils/calculateFee';
 import constants from '../../constants';
 
 describe('Should calculate fees', () => {
@@ -30,5 +32,58 @@ describe('Should calculate fees', () => {
 
   it('Should calculate cash out juridical - when fee is less then min', () => {
     expect(cashOutJuridical(constants.cashOutJuridicalMinFee)).toBe(0.5);
+  });
+
+  it('Should calculate cash out natural', () => {
+    expect(cashOutNatural(100)).toBe(0.3);
+  });
+
+  it('Should return prev cash outs by this user in same week', () => {
+    const currTransaction = {
+      id: 5,
+      user_id: 1,
+      type: 'cash_out',
+      date: '2016-01-10',
+    };
+
+    const otherTransactions = [
+      {
+        id: 0,
+        user_id: 1,
+        type: 'cash_out',
+        date: '2016-01-04',
+      },
+      {
+        id: 1,
+        user_id: 1,
+        type: 'cash_out',
+        date: '2016-01-05',
+      },
+      {
+        id: 2,
+        user_id: 2,
+        type: 'cash_out',
+        date: '2016-01-11',
+      },
+      {
+        id: 3,
+        user_id: 1,
+        type: 'cash_in',
+        date: '2016-01-11',
+      },
+      {
+        id: 7,
+        user_id: 1,
+        type: 'cash_out',
+        date: '2016-01-15',
+      },
+    ];
+
+    expect(
+      prevCashOutsInSameWeek({
+        ...currTransaction,
+        transactions: otherTransactions,
+      }),
+    ).toHaveLength(2);
   });
 });
