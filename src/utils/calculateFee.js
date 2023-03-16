@@ -26,30 +26,38 @@ export function cashOutJuridical(amount) {
   return fee < constants.cashOutJuridicalMinFee ? constants.cashOutJuridicalMinFee : fee;
 }
 
-export function cashOutNatural(amount) {
+export function cashOutNaturalFee(amount) {
   return (constants.cashOutNaturalPercent / 100) * amount;
+}
+
+export function cashOutNatural({
+  id, user_id, transactions, date, amount,
+}) {
+  const prevTransactionsTotal = prevCashOutsInSameWeek({
+    id, user_id, transactions, date,
+  }).reduce((acc, curr) => acc + curr.operation.amount, 0);
+
+  if (prevTransactionsTotal >= constants.cashOutNaturalFreeOfChargeLimit) {
+    return cashOutNaturalFee(amount);
+  }
+
+  const limitLeft = constants.cashOutNaturalFreeOfChargeLimit - prevTransactionsTotal;
+  const newAmount = amount - limitLeft;
+
+  if (newAmount <= 0) {
+    return 0;
+  }
+
+  return cashOutNaturalFee(newAmount);
 }
 
 export function calculateCashOut({
   id, user_id, transactions, user_type, amount, date,
 }) {
   if (user_type === 'natural') {
-    const prevTransactionsTotal = prevCashOutsInSameWeek({
-      id, user_id, transactions, date,
-    }).reduce((acc, curr) => acc + curr.operation.amount, 0);
-
-    if (prevTransactionsTotal >= constants.cashOutNaturalFreeOfChargeLimit) {
-      return cashOutNatural(amount);
-    }
-
-    const limitLeft = constants.cashOutNaturalFreeOfChargeLimit - prevTransactionsTotal;
-    const newAmount = amount - limitLeft;
-
-    if (newAmount <= 0) {
-      return 0;
-    }
-
-    return cashOutNatural(newAmount);
+    return cashOutNatural({
+      id, user_id, transactions, date, amount,
+    });
   }
 
   if (user_type === 'juridical') {
