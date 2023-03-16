@@ -6,7 +6,7 @@
 
 #### Run the app
 ##### `npm start [filepath]`
-##### *e.g. `npm run input.json`*
+##### *e.g. `npm start input.json`*
 
 ----
 
@@ -19,7 +19,7 @@
 #### Run tests
 ##### `npm test`
 
-##### *you can use `test:cover` and `test:watch` also*
+##### *you can use `npm run test:cover` and `npm run test:watch` also*
 
 ----
 
