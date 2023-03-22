@@ -13,7 +13,7 @@ async function app() {
   transactions.forEach((transaction) => {
     const fee = roundFee(calculateFee(transaction, transactions));
 
-    console.log(fee);
+    console.log(fee.toFixed(2));
   });
 }
 
